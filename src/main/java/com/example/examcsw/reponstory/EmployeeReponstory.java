@@ -6,6 +6,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-public interface EmployeeReponstory {
+@Repository
+public interface EmployeeReponstory extends JpaRepository<Employee, Integer> {
     List<Employee> findAllByName(String name);
+    List<Employee> findAllByNameContainsIgnoreCase(String name);
+    List<Employee> findAllByNameAndSalary(String name, String email);
+    List<Employee> findAllByNameOrderBySalaryAsc(String name);
 }

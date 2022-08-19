@@ -6,11 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.websocket.server.PathParam;
 import java.util.List;
 
 @RestController
@@ -19,28 +17,50 @@ public class EmployeeControler {
     EmployeeService employeeService;
 
     @RequestMapping(value = "employee", method = RequestMethod.GET)
-    public ResponseEntity<List<Employee>> findAllUser() {
-        List<Employee> lsEmployee = employeeService.findAll();
-        if (lsEmployee.size() == 0) {
+    public ResponseEntity<List<Employee>> findAllEmployee() {
+        List<Employee> list = employeeService.findAll();
+        if (list.size() == 0) {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         }
-        return new ResponseEntity<List<Employee>>(lsEmployee, HttpStatus.OK);
+        return new ResponseEntity<List<Employee>>(list, HttpStatus.OK);
     }
 
     @RequestMapping(value = "create", method = RequestMethod.POST)
-    public ResponseEntity<Employee> saveNewUser(@RequestBody Employee employee) {
-        employeeService.saveEmployee(employee);
-        return new ResponseEntity<Employee>(employee, HttpStatus.OK);
+    public ResponseEntity<Employee> save(@RequestBody Employee employees) {
+        employeeService.save(employees);
+        return new ResponseEntity<Employee>(employees, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "updateUser", method = RequestMethod.PUT)
-    public ResponseEntity<Employee> saveNewEmployee(
-            @Param("id") Integer id,
-            @RequestBody Employee employee) {
-        Employee oldEmployee = employeeService.findById(id);
-        oldEmployee.setName(employee.getName());
-        oldEmployee.setSalary(employee.getSalary());
-        employeeService.saveEmployee(oldEmployee);
-        return new ResponseEntity<Employee>(oldEmployee, HttpStatus.OK);
+    @RequestMapping(value = "update", method = RequestMethod.PUT)
+    public ResponseEntity<Employee> update(@PathParam("id") Integer id, @RequestBody Employee employees) {
+        Employee oldEmployees = employeeService.findById(id);
+        oldEmployees.setName(employees.getName());
+        oldEmployees.setSalary(employees.getSalary());
+        employeeService.save(oldEmployees);
+        return new ResponseEntity<Employee>(employees, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "update/{id}", method = RequestMethod.PUT)
+    public ResponseEntity<Employee> updateE(@PathVariable(value = "id") Integer id, @RequestBody Employee employees) {
+        Employee oldEmployees = employeeService.findById(id);
+        oldEmployees.setName(employees.getName());
+        oldEmployees.setSalary(employees.getSalary());
+        employeeService.save(oldEmployees);
+        return new ResponseEntity<Employee>(employees, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "delete/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<Employee> delete(@PathVariable(value = "id") Integer id) {
+        employeeService.delete(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping(value = "find", method = RequestMethod.GET)
+    public ResponseEntity<List<Employee>> findEmployeesByName(@PathParam("name") String name) {
+        List<Employee> list = employeeService.findAllByNameContainsIgnoreCase(name);
+        if (list.size() == 0) {
+            return new ResponseEntity(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<List<Employee>>(list, HttpStatus.OK);
     }
 }
